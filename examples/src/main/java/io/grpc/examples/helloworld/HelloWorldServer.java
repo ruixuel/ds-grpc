@@ -119,7 +119,7 @@ public class HelloWorldServer {
 			
 			//Put your reply here
 			String replyMessage = "Reply from " + NAME + " Server: Send message successfully to " + IPMap.size() + " users";
-			HelloReply reply = HelloReply.newBuilder(replyMessage).setMessage().build();
+			HelloReply reply = HelloReply.newBuilder().setMessage(replyMessage).build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
 		}
