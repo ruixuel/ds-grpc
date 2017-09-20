@@ -2,19 +2,22 @@ gRPC-Java - An RPC library and framework
 
 clone the git branch: git@github.com:ruixuel/ds-grpc.git
 
-$ # Navigate to the Java examples:
-$ cd grpc-java/examples
+1. Navigate to the Java examples:
 
-From the examples directory:
+	$ cd grpc-java/examples
 
-Compile the client and server
+2. From the examples directory:
 
-$ ./gradlew installDist
+	Compile the client and server
 
-Run the server:
-$ ./build/install/examples/bin/hello-world-server
+	$ ./gradlew installDist
 
-In another terminal, run the client with your message as the argument:
-$ ./build/install/examples/bin/hello-world-client {Your message}
+3. Run the server:
+
+	$ ./build/install/examples/bin/hello-world-server
+
+4. In another terminal, run the client with your message as the argument:
+
+	$ ./build/install/examples/bin/hello-world-client {Your message}
 
 Congratulations! You’ve just run a client-server application with gRPC.
