@@ -32,11 +32,12 @@ public class HelloWorldServer {
 	private Server server;
 	private static Map<String, String> IPMap = new HashMap<String, String>();
 	/* The port on which the server should run */
-	private final static int port = 50051;
-
+	private final static int PORT = 50051;
+	private final static String NAME = "XXX"; //Put your name here
+	
 	private void start() throws IOException {
-		server = ServerBuilder.forPort(port).addService(new GreeterImpl()).build().start();
-		logger.info("Server started, listening on " + port);
+		server = ServerBuilder.forPort(PORT).addService(new GreeterImpl()).build().start();
+		logger.info("Server started, listening on " + PORT);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
@@ -96,7 +97,7 @@ public class HelloWorldServer {
 			HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
 			int i = 0;
 			for (Map.Entry<String, String> ip : IPMap.entrySet()) {
-				clients[i++] = new HelloWorldClient(ip.getKey(), 50051);
+				clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
 			}
 
 			String user = req.getName();
@@ -115,10 +116,13 @@ public class HelloWorldServer {
 					}
 				}
 			}
-			HelloReply reply = HelloReply.newBuilder().setMessage("Reply from Ruixue Server: " + req.getName()).build();
+			
+			//Put your reply here
+			String replyMessage = "Reply from " + NAME + " Server: Send message successfully to " + IPMap.size() + " users";
+			HelloReply reply = HelloReply.newBuilder(replyMessage).setMessage().build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
-
 		}
+		
 	}
 }

@@ -50,7 +50,7 @@ public class HelloWorldClient {
 	public String getHost() {
 		return host;
 	}
-
+	
 	/**
 	 * Construct client for accessing RouteGuide server using the existing
 	 * channel.
@@ -81,7 +81,7 @@ public class HelloWorldClient {
 	public static void main(String[] args) {
 		String IP = "localhost"; // Can be local IP
 		Map<String, String> IPMap = new HashMap<String, String>();
-		IPMap.put("localhost", "Me");
+		IPMap.put("localhost", "My server");
 		IPMap.put("128.237.129.30", "User1");
 		IPMap.put("128.237.130.169", "User2");
 
