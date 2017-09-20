@@ -82,14 +82,14 @@ public class HelloWorldClient {
 		String IP = "localhost"; // Can be local IP
 		Map<String, String> IPMap = new HashMap<String, String>();
 		IPMap.put("localhost", "My server");
-		IPMap.put("128.237.129.30", "User1");
+		IPMap.put("192.168.1.103", "Wenyue");
 		IPMap.put("128.237.130.169", "User2");
 
-		HelloWorldClient[] clients = new HelloWorldClient[1];
-
-		clients[0] = new HelloWorldClient(IP, 50051);
-		// clients[1] = new HelloWorldClient(IP1, 50051);
-		// clients[2] = new HelloWorldClient(IP2, 50051);
+		HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
+		int j = 0;
+		for (Map.Entry<String, String> ip : IPMap.entrySet()) {
+			clients[j++] = new HelloWorldClient(ip.getKey(), 50051);
+		}
 
 		/* Access a service running on the local machine on port 50051 */
 		String user = "world";

@@ -33,8 +33,9 @@ public class HelloWorldServer {
 	private static Map<String, String> IPMap = new HashMap<String, String>();
 	/* The port on which the server should run */
 	private final static int PORT = 50051;
-	private final static String NAME = "XXX"; //Put your name here
-	
+	private final static String NAME = "Ruixue"; // Put your name here
+	private static String messageSent = null;
+
 	private void start() throws IOException {
 		server = ServerBuilder.forPort(PORT).addService(new GreeterImpl()).build().start();
 		logger.info("Server started, listening on " + PORT);
@@ -70,11 +71,11 @@ public class HelloWorldServer {
 	 * Initialize IP List
 	 */
 	private void initalizeIPList() throws InterruptedException {
-		IPMap.put("128.237.130.169", "User1");
-		IPMap.put("128.237.129.30", "User2");
-		IPMap.put("128.237.130.31", "User3");
-		IPMap.put("128.237.130.32", "User4");
-		IPMap.put("128.237.130.33", "User5");
+		IPMap.put("192.168.1.103", "Wenyue");
+		// IPMap.put("128.237.129.30", "User2");
+		// IPMap.put("128.237.130.31", "User3");
+		// IPMap.put("128.237.130.32", "User4");
+		// IPMap.put("128.237.130.33", "User5");
 
 	}
 
@@ -92,37 +93,40 @@ public class HelloWorldServer {
 
 		@Override
 		public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-			System.out.println("Recieve message: " + req.getName());
+			if (!req.getName().equals(messageSent)) {
+				messageSent = req.getName();
+				System.out.println("Recieve message: " + req.getName());
 
-			HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
-			int i = 0;
-			for (Map.Entry<String, String> ip : IPMap.entrySet()) {
-				clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
-			}
+				HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
+				int i = 0;
+				for (Map.Entry<String, String> ip : IPMap.entrySet()) {
+					clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
+				}
 
-			String user = req.getName();
-			for (int j = 0; j < clients.length; j++) {
-				try {
-					clients[j].greet(user, IPMap.get(clients[j].getHost()));
-				} catch (Exception e) {
-					System.out.println(IPMap.get(clients[j].getHost()) + " is offline.");
-					IPMap.remove(clients[j].getHost());
-				} finally {
-					System.out.println("You have " + IPMap.size() + " IPs now.");
+				String user = req.getName();
+				for (int j = 0; j < clients.length; j++) {
 					try {
-						clients[j].shutdown();
+						clients[j].greet(user, IPMap.get(clients[j].getHost()));
 					} catch (Exception e) {
-						System.out.println("Error: shutdown " + clients[j].getHost());
+						System.out.println(IPMap.get(clients[j].getHost()) + " is offline.");
+						IPMap.remove(clients[j].getHost());
+					} finally {
+						System.out.println("You have " + IPMap.size() + " IPs now.");
+						try {
+							clients[j].shutdown();
+						} catch (Exception e) {
+							System.out.println("Error: shutdown " + clients[j].getHost());
+						}
 					}
 				}
 			}
-			
-			//Put your reply here
-			String replyMessage = "Reply from " + NAME + " Server: Send message successfully to " + IPMap.size() + " users";
+
+			// Put your reply here
+			String replyMessage = "Reply from " + NAME + " Server: Message recieved!";
 			HelloReply reply = HelloReply.newBuilder().setMessage(replyMessage).build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
 		}
-		
+
 	}
 }
