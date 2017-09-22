@@ -30,11 +30,11 @@ public class HelloWorldServer {
 	private static final Logger logger = Logger.getLogger(HelloWorldServer.class.getName());
 
 	private Server server;
-	private static Map<String, String> IPMap = new HashMap<String, String>();
 	/* The port on which the server should run */
 	private final static int PORT = 50051;
 	private final static String NAME = "Ruixue"; // Put your name here
 	private static String messageSent = null;
+	private static IPList ipList = IPList.getInstance();
 
 	private void start() throws IOException {
 		server = ServerBuilder.forPort(PORT).addService(new GreeterImpl()).build().start();
@@ -71,11 +71,11 @@ public class HelloWorldServer {
 	 * Initialize IP List
 	 */
 	private void initalizeIPList() throws InterruptedException {
-		IPMap.put("192.168.1.103", "Wenyue");
-		// IPMap.put("128.237.129.30", "User2");
-		// IPMap.put("128.237.130.31", "User3");
-		// IPMap.put("128.237.130.32", "User4");
-		// IPMap.put("128.237.130.33", "User5");
+		ipList.addIP("192.168.1.103", "User1");
+		ipList.addIP("128.237.129.30", "User2");
+		ipList.addIP("128.237.130.31", "User3");
+		ipList.addIP("128.237.130.32", "User4");
+		ipList.addIP("128.237.130.33", "User5");
 
 	}
 
@@ -97,25 +97,49 @@ public class HelloWorldServer {
 				messageSent = req.getName();
 				System.out.println("Recieve message: " + req.getName());
 
-				HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
+				HelloWorldClient[] clients = new HelloWorldClient[ipList.getSize()];
 				int i = 0;
-				for (Map.Entry<String, String> ip : IPMap.entrySet()) {
+				for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
 					clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
 				}
 
 				String user = req.getName();
 				for (int j = 0; j < clients.length; j++) {
 					try {
-						clients[j].greet(user, IPMap.get(clients[j].getHost()));
+						clients[j].greet(user, ipList.getName(clients[j].getHost()));
 					} catch (Exception e) {
-						System.out.println(IPMap.get(clients[j].getHost()) + " is offline.");
-						IPMap.remove(clients[j].getHost());
+						System.out.println(ipList.getName(clients[j].getHost()) + " is offline.");
+						ipList.removeIP(clients[j].getHost());
 					} finally {
-						System.out.println("You have " + IPMap.size() + " IPs now.");
+						System.out.println("You have " + ipList.getSize() + " IPs now.");
 						try {
 							clients[j].shutdown();
 						} catch (Exception e) {
 							System.out.println("Error: shutdown " + clients[j].getHost());
+						}
+					}
+				}
+				
+				clients = new HelloWorldClient[ipList.getSize()];
+				
+				while(ipList.getSize() > 0 && ipList.getSize() < 5) {
+					i = 0;
+					for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
+						clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
+					}
+					for (int j = 0; j < clients.length; j++) {
+						try {
+							clients[j].requestIPS("Request IP List", ipList.getName(clients[j].getHost()));
+						} catch (Exception e) {
+							System.out.println(ipList.getName(clients[j].getHost()) + " is offline.");
+							ipList.removeIP(clients[j].getHost());
+						} finally {
+							System.out.println("You have " + ipList.getSize() + " IPs now.");
+							try {
+								clients[j].shutdown();
+							} catch (Exception e) {
+								System.out.println("Error: shutdown " + clients[j].getHost());
+							}
 						}
 					}
 				}
@@ -124,6 +148,31 @@ public class HelloWorldServer {
 			// Put your reply here
 			String replyMessage = "Reply from " + NAME + " Server: Message recieved!";
 			HelloReply reply = HelloReply.newBuilder().setMessage(replyMessage).build();
+			responseObserver.onNext(reply);
+			responseObserver.onCompleted();
+		}
+
+		@Override
+		public void getIPs(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
+			StringBuffer sb = new StringBuffer();
+//			Random rd = new Random();
+//			int startIndex = rd.nextInt(5);
+			int i = 0;
+			//For Test
+//			Map<String, String> map = new HashMap<String, String>();
+//			map.put("192.168.130.1", "aaa");
+//			map.put("192.168.120.2", "bbb");
+//			map.put("192.168.130.3", "ccc");
+//			map.put("192.168.140.4", "ddd");
+//			map.put("192.168.150.5", "eee");
+			
+//			for (Map.Entry<String, String> ip : map.entrySet()) {
+			for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
+//				if(i < 5) {
+					sb.append(ip.getKey() + "," + ip.getValue() + ";");
+//				}
+			}
+			HelloReply reply = HelloReply.newBuilder().setMessage(sb.toString()).build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
 		}

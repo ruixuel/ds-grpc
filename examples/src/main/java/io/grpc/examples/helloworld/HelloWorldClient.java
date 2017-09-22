@@ -74,6 +74,24 @@ public class HelloWorldClient {
 		}
 	}
 
+	public void requestIPS(String message, String userName) throws StatusRuntimeException {
+		logger.info("Will try to request IP from " + userName);
+		HelloRequest request = HelloRequest.newBuilder().setName(message).build();
+		HelloReply response = null;
+		response = blockingStub.getIPs(request);
+		if (response != null) {
+			String str = response.getMessage();
+			logger.info("Get IP from " + userName + ":" + str);
+			String[] iplist = str.split(";");
+			for(String ipName: iplist) {
+				String ip = ipName.split(",")[0];
+				String name = ipName.split(",")[1];
+				IPList.getInstance().addIP(ip, name);
+			}
+		}
+	}
+
+
 	/**
 	 * Greet server. If provided, the first element of {@code args} is the name
 	 * to use in the greeting.
