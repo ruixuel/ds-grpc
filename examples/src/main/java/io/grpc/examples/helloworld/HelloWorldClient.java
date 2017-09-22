@@ -34,21 +34,27 @@ public class HelloWorldClient {
 	private final ManagedChannel channel;
 	private final GreeterGrpc.GreeterBlockingStub blockingStub;
 	private String host;
+	private String userName;
 
 	/**
 	 * Construct client connecting to HelloWorld server at {@code host:port}.
 	 */
-	public HelloWorldClient(String host, int port) {
+	public HelloWorldClient(String host, String userName, int port) {
 		this(ManagedChannelBuilder.forAddress(host, port)
 				// Channels are secure by default (via SSL/TLS). For the example
 				// we disable TLS to avoid
 				// needing certificates.
 				.usePlaintext(true).build());
 		this.host = host;
+		this.userName = userName;
 	}
 
 	public String getHost() {
 		return host;
+	}
+	
+	public String getName() {
+		return userName;
 	}
 	
 	/**
@@ -79,14 +85,14 @@ public class HelloWorldClient {
 		HelloRequest request = HelloRequest.newBuilder().setName(message).build();
 		HelloReply response = null;
 		response = blockingStub.getIPs(request);
-		if (response != null) {
+		if (response != null && !"".equals(response.getMessage())) {
 			String str = response.getMessage();
 			logger.info("Get IP from " + userName + ":" + str);
 			String[] iplist = str.split(";");
 			for(String ipName: iplist) {
 				String ip = ipName.split(",")[0];
 				String name = ipName.split(",")[1];
-				IPList.getInstance().addIP(ip, name);
+				IPList.getInstance().addUser(ip, name);
 			}
 		}
 	}
@@ -106,7 +112,7 @@ public class HelloWorldClient {
 		HelloWorldClient[] clients = new HelloWorldClient[IPMap.size()];
 		int j = 0;
 		for (Map.Entry<String, String> ip : IPMap.entrySet()) {
-			clients[j++] = new HelloWorldClient(ip.getKey(), 50051);
+			clients[j++] = new HelloWorldClient(ip.getKey(), ip.getValue(), 50051);
 		}
 
 		/* Access a service running on the local machine on port 50051 */

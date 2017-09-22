@@ -3,11 +3,13 @@ package io.grpc.examples.helloworld;
 import java.util.*;
 
 public class IPList {
-	private static Map<String, String> ipMap;
+	private static List<User> userList;
+	private static Set<String> ips;
 	private static IPList ipList = null;
 	
 	private IPList() {
-		ipMap = new HashMap<String, String>();
+		userList = new ArrayList<User>();
+		ips = new HashSet<String>();
 	}
 	
 	public static IPList getInstance() {
@@ -17,24 +19,26 @@ public class IPList {
 		return ipList;
 	}
 	
-	public static void addIP(String ip, String username) {
-		ipMap.put(ip, username);
+	public static void addUser(String ip, String username) {
+		if(ips.contains(ip)) {
+			return;
+		}
+		User u = new User(username, ip);
+		userList.add(u);
+		ips.add(ip);
 	}
 	
-	public static void removeIP(String ip) {
-		ipMap.remove(ip);
+	public static void removeUser(String name, String ip) {
+		ips.remove(ip);
+		userList.remove(new User(name, ip));		
 	}
 	
-	public static Map<String, String> getIPMap() {
-		return ipMap;
-	}
-	
-	public static String getName(String ip) {
-		return ipMap.get(ip);
+	public static User getUserByIndex(int i) {
+		return userList.get(i);
 	}
 	
 	public static int getSize() {
-		return ipMap.size();
+		return userList.size();
 	}
 	
 }

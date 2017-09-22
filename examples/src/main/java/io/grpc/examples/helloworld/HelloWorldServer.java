@@ -71,11 +71,11 @@ public class HelloWorldServer {
 	 * Initialize IP List
 	 */
 	private void initalizeIPList() throws InterruptedException {
-		ipList.addIP("192.168.1.103", "User1");
-		ipList.addIP("128.237.129.30", "User2");
-		ipList.addIP("128.237.130.31", "User3");
-		ipList.addIP("128.237.130.32", "User4");
-		ipList.addIP("128.237.130.33", "User5");
+		ipList.addUser("128.237.139.109", "User1");
+		ipList.addUser("128.237.129.30", "User2");
+		ipList.addUser("128.237.130.31", "User3");
+		ipList.addUser("128.237.130.32", "User4");
+		ipList.addUser("128.237.130.33", "User5");
 
 	}
 
@@ -98,18 +98,18 @@ public class HelloWorldServer {
 				System.out.println("Recieve message: " + req.getName());
 
 				HelloWorldClient[] clients = new HelloWorldClient[ipList.getSize()];
-				int i = 0;
-				for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
-					clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
+				for (int i = 0; i < clients.length; i++) {
+					User u = ipList.getUserByIndex(i);
+					clients[i] = new HelloWorldClient(u.getIP(), u.getName(), PORT);
 				}
 
 				String user = req.getName();
 				for (int j = 0; j < clients.length; j++) {
 					try {
-						clients[j].greet(user, ipList.getName(clients[j].getHost()));
+						clients[j].greet(user, clients[j].getName());
 					} catch (Exception e) {
-						System.out.println(ipList.getName(clients[j].getHost()) + " is offline.");
-						ipList.removeIP(clients[j].getHost());
+						System.out.println(clients[j].getName() + " is offline.");
+						ipList.removeUser(clients[j].getName(), clients[j].getHost());
 					} finally {
 						System.out.println("You have " + ipList.getSize() + " IPs now.");
 						try {
@@ -123,16 +123,16 @@ public class HelloWorldServer {
 				clients = new HelloWorldClient[ipList.getSize()];
 				
 				while(ipList.getSize() > 0 && ipList.getSize() < 5) {
-					i = 0;
-					for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
-						clients[i++] = new HelloWorldClient(ip.getKey(), PORT);
+					for (int i = 0; i < clients.length; i++) {
+						User u = ipList.getUserByIndex(i);
+						clients[i] = new HelloWorldClient(u.getIP(), u.getName(), PORT);
 					}
 					for (int j = 0; j < clients.length; j++) {
 						try {
-							clients[j].requestIPS("Request IP List", ipList.getName(clients[j].getHost()));
+							clients[j].requestIPS("Request IP List", clients[j].getName());
 						} catch (Exception e) {
-							System.out.println(ipList.getName(clients[j].getHost()) + " is offline.");
-							ipList.removeIP(clients[j].getHost());
+							System.out.println(clients[j].getName() + " is offline.");
+							ipList.removeUser(clients[j].getName(), clients[j].getHost());
 						} finally {
 							System.out.println("You have " + ipList.getSize() + " IPs now.");
 							try {
@@ -157,21 +157,44 @@ public class HelloWorldServer {
 			StringBuffer sb = new StringBuffer();
 //			Random rd = new Random();
 //			int startIndex = rd.nextInt(5);
-			int i = 0;
 			//For Test
-//			Map<String, String> map = new HashMap<String, String>();
-//			map.put("192.168.130.1", "aaa");
-//			map.put("192.168.120.2", "bbb");
-//			map.put("192.168.130.3", "ccc");
-//			map.put("192.168.140.4", "ddd");
-//			map.put("192.168.150.5", "eee");
+			List<User> list = new ArrayList<User>();
+			list.add(new User("aaa", "192.168.130.1"));
+			list.add(new User("bbb", "192.168.120.2"));
+			list.add(new User("ccc", "192.168.130.3"));
+			list.add(new User("ddd", "192.168.140.4"));
+			list.add(new User("eee", "192.168.150.5"));
 			
-//			for (Map.Entry<String, String> ip : map.entrySet()) {
-			for (Map.Entry<String, String> ip : ipList.getIPMap().entrySet()) {
-//				if(i < 5) {
-					sb.append(ip.getKey() + "," + ip.getValue() + ";");
-//				}
+			int ip1 = 0;
+			int ip2 = 0;
+			
+			if(list.size() != 1) {
+				Random rd = new Random();
+				ip1 = rd.nextInt(list.size());
+				ip2 = rd.nextInt(list.size());
+				while(ip1 == ip2) {
+					ip2 = rd.nextInt(list.size());
+				}
+				User u1 = list.get(ip1);
+				sb.append(u1.getIP() + "," + u1.getName() + ";");
+				User u2 = list.get(ip2);
+				sb.append(u2.getIP() + "," + u2.getName() + ";");
 			}
+			
+//			if(ipList.getSize() != 1) {
+//				Random rd = new Random();
+//				ip1 = rd.nextInt(ipList.getSize());
+//				ip2 = rd.nextInt(ipList.getSize());
+//				while(ip1 == ip2) {
+//					ip2 = rd.nextInt(ipList.getSize());
+//				}
+//				User u1 = ipList.getUserByIndex(ip1);
+//				sb.append(u1.getIP() + "," + u1.getName() + ";");
+//				User u2 = ipList.getUserByIndex(ip2);
+//				sb.append(u2.getIP() + "," + u2.getName() + ";");
+//			}
+			
+			
 			HelloReply reply = HelloReply.newBuilder().setMessage(sb.toString()).build();
 			responseObserver.onNext(reply);
 			responseObserver.onCompleted();
