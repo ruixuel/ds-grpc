@@ -158,41 +158,41 @@ public class HelloWorldServer {
 //			Random rd = new Random();
 //			int startIndex = rd.nextInt(5);
 			//For Test
-			List<User> list = new ArrayList<User>();
-			list.add(new User("aaa", "192.168.130.1"));
-			list.add(new User("bbb", "192.168.120.2"));
-			list.add(new User("ccc", "192.168.130.3"));
-			list.add(new User("ddd", "192.168.140.4"));
-			list.add(new User("eee", "192.168.150.5"));
+//			List<User> list = new ArrayList<User>();
+//			list.add(new User("aaa", "192.168.130.1"));
+//			list.add(new User("bbb", "192.168.120.2"));
+//			list.add(new User("ccc", "192.168.130.3"));
+//			list.add(new User("ddd", "192.168.140.4"));
+//			list.add(new User("eee", "192.168.150.5"));
 			
 			int ip1 = 0;
 			int ip2 = 0;
 			
-			if(list.size() != 1) {
-				Random rd = new Random();
-				ip1 = rd.nextInt(list.size());
-				ip2 = rd.nextInt(list.size());
-				while(ip1 == ip2) {
-					ip2 = rd.nextInt(list.size());
-				}
-				User u1 = list.get(ip1);
-				sb.append(u1.getIP() + "," + u1.getName() + ";");
-				User u2 = list.get(ip2);
-				sb.append(u2.getIP() + "," + u2.getName() + ";");
-			}
-			
-//			if(ipList.getSize() != 1) {
+//			if(list.size() != 1) {
 //				Random rd = new Random();
-//				ip1 = rd.nextInt(ipList.getSize());
-//				ip2 = rd.nextInt(ipList.getSize());
+//				ip1 = rd.nextInt(list.size());
+//				ip2 = rd.nextInt(list.size());
 //				while(ip1 == ip2) {
-//					ip2 = rd.nextInt(ipList.getSize());
+//					ip2 = rd.nextInt(list.size());
 //				}
-//				User u1 = ipList.getUserByIndex(ip1);
+//				User u1 = list.get(ip1);
 //				sb.append(u1.getIP() + "," + u1.getName() + ";");
-//				User u2 = ipList.getUserByIndex(ip2);
+//				User u2 = list.get(ip2);
 //				sb.append(u2.getIP() + "," + u2.getName() + ";");
 //			}
+			
+			if(ipList.getSize() != 1) {
+				Random rd = new Random();
+				ip1 = rd.nextInt(ipList.getSize());
+				ip2 = rd.nextInt(ipList.getSize());
+				while(ip1 == ip2) {
+					ip2 = rd.nextInt(ipList.getSize());
+				}
+				User u1 = ipList.getUserByIndex(ip1);
+				sb.append(u1.getIP() + "," + u1.getName() + ";");
+				User u2 = ipList.getUserByIndex(ip2);
+				sb.append(u2.getIP() + "," + u2.getName() + ";");
+			}
 			
 			
 			HelloReply reply = HelloReply.newBuilder().setMessage(sb.toString()).build();
